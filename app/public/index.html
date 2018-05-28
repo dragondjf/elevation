@@ -5,13 +5,13 @@
 </body>
 <script src="http://ditu.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=places"></script>
 <script type="text/javascript">
-    // var head = document.getElementsByTagName('head')[0];
-    // var origAppend = head.appendChild;
-    // head.appendChild = function(s)
-    // {
-    //  if (s && s.src && s.src.toString().match(/maps\.googleapis\.com/)) s.src = s.src.replace('maps.googleapis.com','ditu.google.cn');
-    //  origAppend.call(head,s);
-    // };
+    var head = document.getElementsByTagName('head')[0];
+    var origAppend = head.appendChild;
+    head.appendChild = function(s)
+    {
+     if (s && s.src && s.src.toString().match(/maps\.googleapis\.com/)) s.src = s.src.replace('maps.googleapis.com','ditu.google.cn');
+     origAppend.call(head,s);
+    };
     var googleMap = new google.maps.ElevationService();
 
     function queryElevation(pts) {
@@ -52,23 +52,24 @@
             }
         })
     }
-    var startLat = 129;
-    var endLat = 130;
-    var startLng = 0;
-    var endLng = 120;
+    var startLat = 0;
+    var endLat = 90;
+    var startLng = 106;
+    var endLng = 130;
 
     var timeId = setInterval(function(){
         pts = [];
         for (var i = 0; i < 20; i++) {
+            if (startLat <= endLat){
+                startLat += 0.0001;
+            }
             for (var j = 0; j < 25; j++) {
-                if (startLat <= endLat){
-                    startLat += 0.0000001;
-                }
                 if (startLng <= endLng){
-                    startLng += 0.0000001;
+                    startLng += 0.0001;
                 }
-                console.log(startLat, startLng);
+                // console.log(startLat, startLng);
                 var myPt = new google.maps.LatLng(startLat, startLng);
+                // console.log("====",myPt.lat(), myPt.lng());
                 pts.push(myPt)
             }
         }
@@ -79,7 +80,7 @@
             clearInterval(timeId);
         }
 
-    }, 10000);
+    }, 2000);
 
     // pts = []
     // for (var i =106; i < 130; i+=0.0000001) {
