@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head></head>
+<body>
+    Get Elevation By Google
+</body>
+<script src="http://ditu.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=places"></script>
+<script type="text/javascript">
+    // var head = document.getElementsByTagName('head')[0];
+    // var origAppend = head.appendChild;
+    // head.appendChild = function(s)
+    // {
+    //  if (s && s.src && s.src.toString().match(/maps\.googleapis\.com/)) s.src = s.src.replace('maps.googleapis.com','ditu.google.cn');
+    //  origAppend.call(head,s);
+    // };
+    var googleMap = new google.maps.ElevationService();
+
+    function queryElevation(pts) {
+        googleMap.getElevationForLocations({locations:pts},function(res)
+        {
+            var ajax = new XMLHttpRequest();
+     
+            // 使用post请求
+            ajax.open('post','/evelation');
+     
+            // 如果 使用post发送数据 必须 设置 如下内容
+            // 修改了 发送给 服务器的 请求报文的 内容
+            // 如果需要像 HTML 表单那样 POST 数据，请使用 setRequestHeader() 来添加 HTTP 头。然后在 send() 方法中规定您希望发送的数据：
+            ajax.setRequestHeader("Content-type","application/json");
+            // 发送
+            // post请求 发送的数据 写在 send方法中
+            // 格式 name=jack&age=18 字符串的格式
+            var results = [];
+            for (i in res) {
+                ret = {
+                    "lat": res[i].location.lat(),
+                    "lng": res[i].location.lng(),
+                    "resolution": res[i].resolution,
+                    "elevation": res[i].elevation
+                }
+                console.log(ret)
+                results.push(ret)
+            }
+            // console.log(results);
+            ajax.send(JSON.stringify(results));
+
+            ajax.onreadystatechange=function()
+            {
+                if (ajax.readyState==4 && ajax.status==200)
+                {
+                    document.getElementsByTagName('body')[0].innerText = JSON.stringify(JSON.parse(ajax.responseText));
+                }
+            }
+        })
+    }
+    var startLat = 129;
+    var endLat = 130;
+    var startLng = 0;
+    var endLng = 120;
+
+    var timeId = setInterval(function(){
+        pts = [];
+        for (var i = 0; i < 20; i++) {
+            for (var j = 0; j < 25; j++) {
+                if (startLat <= endLat){
+                    startLat += 0.0000001;
+                }
+                if (startLng <= endLng){
+                    startLng += 0.0000001;
+                }
+                console.log(startLat, startLng);
+                var myPt = new google.maps.LatLng(startLat, startLng);
+                pts.push(myPt)
+            }
+        }
+        console.log(pts);
+        queryElevation(pts);
+
+        if (startLat == endLat && startLng == endLng){
+            clearInterval(timeId);
+        }
+
+    }, 10000);
+
+    // pts = []
+    // for (var i =106; i < 130; i+=0.0000001) {
+    //     for (var j = -30; j < 20 ; i+=0.0000001) {
+    //         var myPt = new google.maps.LatLng(i, j);
+    //         pts.push(myPt);
+    //         if (pts.length == 500){
+    //             console.log(pts)
+    //             queryElevation(pts);
+    //             pts = [];
+    //         }
+    //     }
+    // }
+</script>
