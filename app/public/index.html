@@ -40,7 +40,7 @@
                 // console.log(ret)
                 results.push(ret)
             }
-            // console.log(results);
+            console.log("========", results);
             ajax.send(JSON.stringify(results));
 
             ajax.onreadystatechange=function()
@@ -57,11 +57,14 @@
         })
     }
     var startLat = 0;
-    var endLat = 120;
+    var endLat = 40;
     var startLng = 106;
     var endLng = 130;
     var precison = 0.00001;
- 
+    
+    var lngPrecison = 0.0089831528411395; // 1km
+    var latPrecison = 0.00898318; // 1km
+
     var proxyLng  = startLng;
     var proxyLat = startLat;
     var timeId = setInterval(function(){
@@ -84,5 +87,11 @@
             clearInterval(timeId);
         }
 
-    }, 2000);
+    }, 25000);
+
+
+    var A = new google.maps.LatLng(0, 0);
+    var B = new google.maps.LatLng(0, 1);
+    console.log(google.maps.geometry.spherical);
+
 </script>
