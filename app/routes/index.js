@@ -20,6 +20,7 @@ function createSql(sql, params, callback) {
 
 
 var modSql = 'INSERT INTO mapdata SET ?';
+var Count = 0;
 /* GET home page. */
 router.get('/', function(req, res, next) {
    fs.readFile(path.join(__dirname, 'public/index.html'), function (err, bytesRead) {  
@@ -40,7 +41,9 @@ router.post("/elevation", function(req, res) {
             if(err){
                console.error("事务执行失败");
             }else{
-               console.log("插入成功.");
+               Count += sqls.length;
+               console.log("插入成功：", sqls.length);
+               console.log("累计插入成功：", Count);
             }
         })
         res.json(req.body);
