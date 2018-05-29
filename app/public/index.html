@@ -20,7 +20,7 @@
             var ajax = new XMLHttpRequest();
      
             // 使用post请求
-            ajax.open('post','/evelation');
+            ajax.open('post','/elevation');
      
             // 如果 使用post发送数据 必须 设置 如下内容
             // 修改了 发送给 服务器的 请求报文的 内容
@@ -37,7 +37,7 @@
                     "resolution": res[i].resolution,
                     "elevation": res[i].elevation
                 }
-                console.log(ret)
+                // console.log(ret)
                 results.push(ret)
             }
             // console.log(results);
@@ -47,51 +47,47 @@
             {
                 if (ajax.readyState==4 && ajax.status==200)
                 {
-                    document.getElementsByTagName('body')[0].innerText = JSON.stringify(JSON.parse(ajax.responseText));
+                    var res = JSON.parse(ajax.responseText);
+                    console.log(res)
+                    if (res.length > 0){
+                    document.getElementsByTagName('body')[0].innerText = "经纬度：（" + res[0].lng + ","
+                                                                        +  res[0].lat + "）\n"
+                                                                        + "海拔：" + res[0].elevation + "\n"
+                                                                        + "分辨率：" + res[0].resolution;
+                                                                    }
                 }
             }
         })
     }
     var startLat = 0;
-    var endLat = 90;
+    var endLat = 120;
     var startLng = 106;
     var endLng = 130;
-
+    var precison = 0.000001;
+ 
+    var proxyLng  = startLng;
+    var proxyLat = startLat;
     var timeId = setInterval(function(){
         pts = [];
-        for (var i = 0; i < 20; i++) {
-            if (startLat <= endLat){
-                startLat += 0.0001;
-            }
-            for (var j = 0; j < 25; j++) {
-                if (startLng <= endLng){
-                    startLng += 0.0001;
-                }
-                // console.log(startLat, startLng);
-                var myPt = new google.maps.LatLng(startLat, startLng);
-                // console.log("====",myPt.lat(), myPt.lng());
+        for (var i = 0; i < 500; i++) {
+            if (proxyLng <= endLng){
+                proxyLng += precison;
+                var myPt = new google.maps.LatLng(proxyLat, proxyLng);
                 pts.push(myPt)
             }
         }
-        console.log(pts);
+        console.log(pts.length);
         queryElevation(pts);
 
-        if (startLat == endLat && startLng == endLng){
+        if (Math.abs(proxyLng-endLng) <= precison){
+            proxyLng = startLng;
+            proxyLat += precison;
+        }
+        console.log("timeid:" + timeId, proxyLng, proxyLat)
+        if (proxyLng == endLng && proxyLat == endLat){
+            console.log("stop")
             clearInterval(timeId);
         }
 
     }, 2000);
-
-    // pts = []
-    // for (var i =106; i < 130; i+=0.0000001) {
-    //     for (var j = -30; j < 20 ; i+=0.0000001) {
-    //         var myPt = new google.maps.LatLng(i, j);
-    //         pts.push(myPt);
-    //         if (pts.length == 500){
-    //             console.log(pts)
-    //             queryElevation(pts);
-    //             pts = [];
-    //         }
-    //     }
-    // }
 </script>
