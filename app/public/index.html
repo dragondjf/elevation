@@ -13,7 +13,7 @@
      origAppend.call(head,s);
     };
     var googleMap = new google.maps.ElevationService();
-
+    var count = 0;
     function queryElevation(pts) {
         googleMap.getElevationForLocations({locations:pts},function(res)
         {
@@ -48,13 +48,10 @@
                 if (ajax.readyState==4 && ajax.status==200)
                 {
                     var res = JSON.parse(ajax.responseText);
-                    console.log(res)
                     if (res.length > 0){
-                    document.getElementsByTagName('body')[0].innerText = "经纬度：（" + res[0].lng + ","
-                                                                        +  res[0].lat + "）\n"
-                                                                        + "海拔：" + res[0].elevation + "\n"
-                                                                        + "分辨率：" + res[0].resolution;
-                                                                    }
+                        count += res.length;
+                        document.getElementsByTagName('body')[0].innerText = "累计获取数据条数: " + count;
+                    }
                 }
             }
         })
@@ -63,7 +60,7 @@
     var endLat = 120;
     var startLng = 106;
     var endLng = 130;
-    var precison = 0.000001;
+    var precison = 0.00001;
  
     var proxyLng  = startLng;
     var proxyLat = startLat;
@@ -76,14 +73,12 @@
                 pts.push(myPt)
             }
         }
-        console.log(pts.length);
         queryElevation(pts);
 
         if (Math.abs(proxyLng-endLng) <= precison){
             proxyLng = startLng;
             proxyLat += precison;
         }
-        console.log("timeid:" + timeId, proxyLng, proxyLat)
         if (proxyLng == endLng && proxyLat == endLat){
             console.log("stop")
             clearInterval(timeId);
